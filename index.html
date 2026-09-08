@@ -21,22 +21,6 @@
         <div id="canvas-container" class="mode-stir">
             <canvas id="viewport-canvas"></canvas>
             
-            <!-- Interaction Tool Mode Switcher (Top Center) -->
-            <div id="interaction-bar">
-                <button class="mode-pill active" id="pill-mode-stir" data-mode="stir" title="Stir Fluid Mode (Key: 1 or T)">
-                    <span class="mode-icon">🌊</span>
-                    <span class="mode-label">Stir</span>
-                </button>
-                <button class="mode-pill" id="pill-mode-wand" data-mode="wand" title="Bubble Wand Mode (Key: 2 or W)">
-                    <span class="mode-icon">🪄</span>
-                    <span class="mode-label">Wand</span>
-                </button>
-                <button class="mode-pill" id="pill-mode-pin" data-mode="pin" title="Pin / Needle Mode (Key: 3 or P)">
-                    <span class="mode-icon">📍</span>
-                    <span class="mode-label">Pin</span>
-                </button>
-            </div>
-
             <!-- Canvas Overlay Hints & Floating Controls -->
             <div id="canvas-hint">
                 <span class="hint-pill" id="hint-text">🌊 Stir Mode: Drag to stir fluid &bull; Click bubble to pop / water to add</span>
@@ -65,8 +49,11 @@
                     </svg>
                 </button>
                 <button id="btn-floating-fullscreen" class="floating-btn" title="Toggle Fullscreen">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <svg id="icon-enter-fullscreen" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                         <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                    <svg id="icon-exit-fullscreen" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
                     </svg>
                 </button>
             </div>

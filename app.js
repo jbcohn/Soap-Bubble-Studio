@@ -1739,14 +1739,27 @@ class BubbleApp {
             this.canvas.style.width = `${rect.width}px`;
             this.canvas.style.height = `${rect.height}px`;
 
-            // Adjust simulation domain
+            // Adjust simulation domain and smoothly recenter bubble raft on resize
+            const oldCenter = this.sim.center ? [this.sim.center[0], this.sim.center[1]] : [rect.width / 2.0, rect.height / 2.0];
+            const newCenter = [rect.width / 2.0, rect.height / 2.0];
+            const dx = newCenter[0] - oldCenter[0];
+            const dy = newCenter[1] - oldCenter[1];
+
+            if (this.sim.numBubbles > 0 && (Math.abs(dx) > 1 || Math.abs(dy) > 1)) {
+                for (let i = 0; i < this.sim.numBubbles; i++) {
+                    this.sim.pos[i * 2] += dx;
+                    this.sim.pos[i * 2 + 1] += dy;
+                }
+            }
+
             const simDim = Math.min(rect.width, rect.height);
             this.sim.w = rect.width;
             this.sim.h = rect.height;
-            this.sim.center = [rect.width / 2.0, rect.height / 2.0];
+            this.sim.center = newCenter;
             this.sim.radiusContainer = simDim * 0.44;
         };
 
+        this.resizeCanvas = resize;
         window.addEventListener("resize", resize);
         resize();
 
@@ -1866,11 +1879,6 @@ class BubbleApp {
         container.classList.remove("mode-stir", "mode-wand", "mode-pin");
         container.classList.add(`mode-${mode}`);
 
-        // Update top bar pills
-        document.querySelectorAll(".mode-pill").forEach(p => {
-            p.classList.toggle("active", p.getAttribute("data-mode") === mode);
-        });
-
         // Update sidebar tool buttons
         document.querySelectorAll(".tool-select-btn").forEach(b => {
             b.classList.toggle("active", b.getAttribute("data-mode") === mode);
@@ -1980,14 +1988,6 @@ class BubbleApp {
                 if (postUpdate) postUpdate(val);
             });
         };
-
-        // Tool mode buttons (Top pill bar)
-        document.querySelectorAll(".mode-pill").forEach(pill => {
-            pill.addEventListener("click", () => {
-                const mode = pill.getAttribute("data-mode");
-                this.setInteractionMode(mode);
-            });
-        });
 
         // Tool mode buttons (Sidebar)
         document.querySelectorAll(".tool-select-btn").forEach(btn => {
@@ -2118,14 +2118,38 @@ class BubbleApp {
             }
         });
 
-        // Fullscreen
-        document.getElementById("btn-floating-fullscreen").addEventListener("click", () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(() => {});
-            } else {
-                document.exitFullscreen().catch(() => {});
+        // Fullscreen toggle & state synchronization
+        const btnFullscreen = document.getElementById("btn-floating-fullscreen");
+        if (btnFullscreen) {
+            btnFullscreen.addEventListener("click", () => {
+                const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+                if (!isFull) {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(() => {});
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                }
+            });
+        }
+
+        const onFullscreenChange = () => {
+            const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            document.body.classList.toggle("is-fullscreen", isFull);
+            if (this.resizeCanvas) {
+                // Ensure canvas immediately reflows to fill the 100% viewport width
+                requestAnimationFrame(() => this.resizeCanvas());
+                setTimeout(() => this.resizeCanvas(), 80);
             }
-        });
+        };
+        document.addEventListener("fullscreenchange", onFullscreenChange);
+        document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 
         // Export PNG & SVG
         document.getElementById("btn-export-png").addEventListener("click", () => {
