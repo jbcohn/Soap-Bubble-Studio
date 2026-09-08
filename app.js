@@ -231,18 +231,17 @@ function getHybridIridescentTexture(radiusPx, seed, saturation, transparency) {
             const dist = Math.sqrt(distSq);
             const normDist = dist / rFloat; // 0 (center) to 1 (rim)
 
-            // Viewing angle cos(theta)
+            // Viewing angle cos(theta) across spherical bubble dome
             const cosTheta = Math.sqrt(Math.max(0.0, 1.0 - normDist * normDist));
-            const angle = Math.atan2(dy, dx) + seedOffset;
+            const nx = dx / rFloat;
+            const ny = dy / rFloat;
 
-            // Model 2: Marangoni convective eddies / fluid flow streamlines
-            const swirl1 = Math.sin(angle * 2.0 + normDist * 5.0) * 0.08;
-            const swirl2 = Math.cos(angle * 3.0 - normDist * 4.0) * 0.06;
-            const eddy = Math.sin(dx * 0.08 + dy * 0.06) * 0.04;
-            const fluidPerturb = swirl1 + swirl2 + eddy;
+            // Natural, scale-invariant lighting bias from upper-left matching specular highlights
+            const lightBias = (-nx * 0.16 - ny * 0.16) * (1.0 - normDist);
+            const variantShift = (variant / 12.0) * 0.14;
 
-            // Model 3: Optical path length phase shift Delta = 2 n d cos(theta)
-            const deltaPhase = 1.35 * (1.0 - cosTheta) + fluidPerturb;
+            // Optical path length phase shift Delta = 2 n d cos(theta) (silky smooth, zero waviness)
+            const deltaPhase = 1.35 * Math.max(0.0, 1.0 - cosTheta + lightBias) + variantShift;
 
             const [rgbR, rgbG, rgbB] = interpolateMichelLevy(deltaPhase, saturation);
 
