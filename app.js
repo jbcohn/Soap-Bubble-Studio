@@ -1884,21 +1884,17 @@ class BubbleApp {
             b.classList.toggle("active", b.getAttribute("data-mode") === mode);
         });
 
-        // Update hints and badges
+        // Update badge
         const badge = document.getElementById("val-active-tool");
-        const hint = document.getElementById("hint-text");
 
         if (mode === "stir") {
             if (badge) badge.textContent = "🌊 Stir Fluid";
-            if (hint) hint.innerHTML = "🌊 <strong>Stir Mode</strong>: Drag to stir fluid &bull; Click bubble to pop / water to add";
             this.showToast("Stir / Swirl Mode Active 🌊");
         } else if (mode === "wand") {
             if (badge) badge.textContent = "🪄 Bubble Wand";
-            if (hint) hint.innerHTML = "🪄 <strong>Bubble Wand Mode</strong>: Click & drag to blow continuous iridescent bubbles";
             this.showToast("Bubble Wand Mode Active 🪄");
         } else if (mode === "pin") {
             if (badge) badge.textContent = "📍 Pin Needle";
-            if (hint) hint.innerHTML = "📍 <strong>Pin Needle Mode</strong>: Click or slice across bubbles to pop them instantly!";
             this.showToast("Pin / Needle Mode Active 📍");
         }
     }
@@ -2118,38 +2114,82 @@ class BubbleApp {
             }
         });
 
-        // Fullscreen toggle & state synchronization
+        // Fullscreen & Sidebar Hiding State Management
+        this.isFullscreen = false;
+        const appContainer = document.getElementById("app-container");
+        const controlPanel = document.getElementById("control-panel");
         const btnFullscreen = document.getElementById("btn-floating-fullscreen");
-        if (btnFullscreen) {
-            btnFullscreen.addEventListener("click", () => {
-                const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
-                if (!isFull) {
-                    if (document.documentElement.requestFullscreen) {
-                        document.documentElement.requestFullscreen().catch(() => {});
-                    } else if (document.documentElement.webkitRequestFullscreen) {
-                        document.documentElement.webkitRequestFullscreen();
-                    }
-                } else {
+        const btnCollapseSidebar = document.getElementById("btn-collapse-sidebar");
+
+        const setFullscreenState = (active) => {
+            this.isFullscreen = active;
+            document.body.classList.toggle("is-fullscreen", active);
+            if (appContainer) {
+                appContainer.classList.toggle("fullscreen-active", active);
+                appContainer.classList.toggle("sidebar-hidden", active);
+            }
+            if (controlPanel) {
+                controlPanel.classList.toggle("hidden-fullscreen", active);
+                // Guaranteed inline style fallback in case of cached CSS
+                controlPanel.style.display = active ? "none" : "";
+            }
+            if (btnFullscreen) {
+                btnFullscreen.title = active ? "Show Menu / Exit Fullscreen (F or Esc)" : "Hide Menu / Enter Fullscreen (F)";
+            }
+            if (this.resizeCanvas) {
+                requestAnimationFrame(() => this.resizeCanvas());
+                setTimeout(() => this.resizeCanvas(), 50);
+                setTimeout(() => this.resizeCanvas(), 200);
+            }
+        };
+
+        const toggleFullscreen = () => {
+            const isNative = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            const shouldBeFull = !this.isFullscreen && !isNative;
+
+            setFullscreenState(shouldBeFull);
+
+            if (shouldBeFull) {
+                const target = appContainer || document.documentElement;
+                if (target.requestFullscreen) {
+                    target.requestFullscreen().catch(() => {});
+                } else if (target.webkitRequestFullscreen) {
+                    target.webkitRequestFullscreen();
+                }
+                this.showToast("Fullscreen Active (Press Esc or F to exit)");
+            } else {
+                if (isNative) {
                     if (document.exitFullscreen) {
                         document.exitFullscreen().catch(() => {});
                     } else if (document.webkitExitFullscreen) {
                         document.webkitExitFullscreen();
                     }
                 }
-            });
-        }
-
-        const onFullscreenChange = () => {
-            const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement);
-            document.body.classList.toggle("is-fullscreen", isFull);
-            if (this.resizeCanvas) {
-                // Ensure canvas immediately reflows to fill the 100% viewport width
-                requestAnimationFrame(() => this.resizeCanvas());
-                setTimeout(() => this.resizeCanvas(), 80);
             }
         };
-        document.addEventListener("fullscreenchange", onFullscreenChange);
-        document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+        if (btnFullscreen) {
+            btnFullscreen.addEventListener("click", toggleFullscreen);
+        }
+
+        if (btnCollapseSidebar) {
+            btnCollapseSidebar.addEventListener("click", toggleFullscreen);
+        }
+
+        const onNativeFullscreenChange = () => {
+            const isNative = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            setFullscreenState(isNative);
+        };
+        document.addEventListener("fullscreenchange", onNativeFullscreenChange);
+        document.addEventListener("webkitfullscreenchange", onNativeFullscreenChange);
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && this.isFullscreen) {
+                setFullscreenState(false);
+            } else if ((e.key === "f" || e.key === "F") && !e.target.matches("input, select, textarea")) {
+                toggleFullscreen();
+            }
+        });
 
         // Export PNG & SVG
         document.getElementById("btn-export-png").addEventListener("click", () => {

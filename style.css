@@ -69,28 +69,6 @@ html, body {
 }
 
 /* Canvas Overlays */
-#canvas-hint {
-    position: absolute;
-    top: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-    z-index: 10;
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-}
-
-.hint-pill {
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
-    font-size: 0.8rem;
-    padding: 6px 14px;
-    border-radius: 9999px;
-    letter-spacing: 0.02em;
-}
-
 #floating-controls {
     position: absolute;
     top: 16px;
@@ -184,31 +162,62 @@ html, body {
     box-shadow: -8px 0 30px rgba(0, 0, 0, 0.4);
 }
 
-/* Fullscreen Mode: Hide sidebar menu completely so canvas fills 100% of the screen */
-:fullscreen #control-panel {
-    display: none !important;
-}
-
+/* Fullscreen & Sidebar Visibility: Hide sidebar completely so canvas fills 100% */
+#control-panel.hidden-fullscreen,
+#app-container.fullscreen-active #control-panel,
+#app-container.sidebar-hidden #control-panel,
+body.is-fullscreen #control-panel,
+:fullscreen #control-panel,
 :-webkit-full-screen #control-panel {
     display: none !important;
 }
 
-body.is-fullscreen #control-panel {
+#icon-exit-fullscreen {
+    display: none;
+}
+
+body.is-fullscreen #icon-enter-fullscreen,
+#app-container.fullscreen-active #icon-enter-fullscreen,
+#app-container.sidebar-hidden #icon-enter-fullscreen {
     display: none !important;
 }
 
-body.is-fullscreen #icon-enter-fullscreen {
-    display: none;
-}
-
-body:not(.is-fullscreen) #icon-exit-fullscreen {
-    display: none;
+body.is-fullscreen #icon-exit-fullscreen,
+#app-container.fullscreen-active #icon-exit-fullscreen,
+#app-container.sidebar-hidden #icon-exit-fullscreen {
+    display: inline-block !important;
 }
 
 #panel-header {
-    padding: 18px 20px;
+    padding: 16px 18px;
     border-bottom: 1px solid var(--border-color);
     background: rgba(30, 41, 59, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.collapse-sidebar-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #94a3b8;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.collapse-sidebar-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateX(1px);
 }
 
 .brand {

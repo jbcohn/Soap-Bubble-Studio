@@ -13,18 +13,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.2">
 </head>
 <body>
     <div id="app-container">
         <!-- Canvas Viewport Area -->
         <div id="canvas-container" class="mode-stir">
             <canvas id="viewport-canvas"></canvas>
-            
-            <!-- Canvas Overlay Hints & Floating Controls -->
-            <div id="canvas-hint">
-                <span class="hint-pill" id="hint-text">🌊 Stir Mode: Drag to stir fluid &bull; Click bubble to pop / water to add</span>
-            </div>
 
             <div id="floating-controls">
                 <button id="btn-floating-pause" class="floating-btn" title="Pause / Play Simulation (Space)">
@@ -77,6 +72,11 @@
                         <p class="subtitle">Capillary Foam & Iridescent Physics</p>
                     </div>
                 </div>
+                <button type="button" id="btn-collapse-sidebar" class="collapse-sidebar-btn" title="Hide Sidebar / Fullscreen View (F)">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
             </div>
 
             <div id="panel-content">
@@ -335,6 +335,6 @@
     </div>
 
     <!-- Script Entry -->
-    <script src="app.js"></script>
+    <script src="app.js?v=1.2"></script>
 </body>
 </html>
