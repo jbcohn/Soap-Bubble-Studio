@@ -1732,9 +1732,9 @@ class BubbleApp {
     initCanvas() {
         const resize = () => {
             const rect = this.canvas.parentElement.getBoundingClientRect();
-            const dpr = Math.min(2.0, window.devicePixelRatio || 1.0);
-            this.canvas.width = Math.round(rect.width * dpr);
-            this.canvas.height = Math.round(rect.height * dpr);
+            this.dpr = Math.min(2.5, window.devicePixelRatio || 1.0);
+            this.canvas.width = Math.round(rect.width * this.dpr);
+            this.canvas.height = Math.round(rect.height * this.dpr);
             this.canvas.style.width = `${rect.width}px`;
             this.canvas.style.height = `${rect.height}px`;
 
@@ -1774,12 +1774,27 @@ class BubbleApp {
         // Mouse & Touch interaction
         const getCanvasCoords = (e) => {
             const rect = this.canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return [clientX - rect.left, clientY - rect.top];
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+
+            if (e.targetTouches && e.targetTouches.length > 0) {
+                clientX = e.targetTouches[0].clientX;
+                clientY = e.targetTouches[0].clientY;
+            } else if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
+            }
+
+            const scaleX = rect.width > 0 ? (this.sim.w / rect.width) : 1.0;
+            const scaleY = rect.height > 0 ? (this.sim.h / rect.height) : 1.0;
+            return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
         };
 
         const onDown = (e) => {
+            if (e.cancelable) e.preventDefault();
             this.audio.resume();
             this.isDragging = true;
             this.lastMouse = getCanvasCoords(e);
@@ -1797,6 +1812,7 @@ class BubbleApp {
 
         const onMove = (e) => {
             if (!this.isDragging) return;
+            if (e.cancelable) e.preventDefault();
             const curr = getCanvasCoords(e);
 
             if (this.interactionMode === "stir") {
@@ -1864,9 +1880,9 @@ class BubbleApp {
         window.addEventListener("mousemove", onMove);
         window.addEventListener("mouseup", onUp);
 
-        this.canvas.addEventListener("touchstart", onDown, { passive: true });
-        window.addEventListener("touchmove", onMove, { passive: true });
-        window.addEventListener("touchend", onUp);
+        this.canvas.addEventListener("touchstart", onDown, { passive: false });
+        window.addEventListener("touchmove", onMove, { passive: false });
+        window.addEventListener("touchend", onUp, { passive: false });
     }
 
     setInteractionMode(mode) {
@@ -2320,7 +2336,7 @@ class BubbleApp {
 
         // Render viewport
         const rect = this.canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1.0;
+        const dpr = this.dpr || 1.0;
         this.ctx.save();
         this.ctx.scale(dpr, dpr);
 
