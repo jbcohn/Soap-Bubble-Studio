@@ -379,7 +379,7 @@ class BubbleSimulation {
         this.simTime = 0.0;
 
         // Bubble bursting / popping mechanics
-        this.poppingEnabled = false;
+        this.poppingEnabled = true;
         this.popAcuteAngleThreshold = 34.0; // degrees (stable Plateau triple junctions are 60°)
         this.popMaxOverlapRatio = 0.50;     // 50% radius compression limit
         this.lastAutoPopTime = 0.0;
@@ -1695,8 +1695,12 @@ class BubbleApp {
 
         this.sim = new BubbleSimulation(900, 900, "Circular Dish");
         this.audio = new BubbleAudioEngine();
-        this.sim.onPopCallback = (r) => this.audio.playPop(r);
+        this.sim.onPopCallback = (r) => {
+            this.audio.playPop(r);
+            this.updateStats();
+        };
 
+        this.lastBubbleCount = -1;
         this.isPlaying = true;
         this.lastTime = performance.now();
         this.frameCount = 0;
@@ -2060,6 +2064,9 @@ class BubbleApp {
         const rowPopAngle = document.getElementById("row-pop-angle");
         if (checkPopping) {
             checkPopping.checked = this.sim.poppingEnabled;
+            if (rowPopAngle) {
+                rowPopAngle.style.display = this.sim.poppingEnabled ? "flex" : "none";
+            }
             checkPopping.addEventListener("change", (e) => {
                 this.sim.poppingEnabled = e.target.checked;
                 if (rowPopAngle) {
@@ -2300,7 +2307,11 @@ class BubbleApp {
     }
 
     updateStats() {
-        document.getElementById("stat-bubbles").textContent = `${this.sim.numBubbles} bubbles`;
+        const badge = document.getElementById("stat-bubbles");
+        if (badge) {
+            badge.textContent = `${this.sim.numBubbles} bubbles`;
+        }
+        this.lastBubbleCount = this.sim.numBubbles;
     }
 
     showToast(msg) {
@@ -2332,6 +2343,11 @@ class BubbleApp {
         // Advance physics simulation
         if (this.isPlaying) {
             this.sim.step(0.65);
+        }
+
+        // Automatically synchronize bubble count display whenever bubbles pop or change
+        if (this.sim.numBubbles !== this.lastBubbleCount) {
+            this.updateStats();
         }
 
         // Render viewport

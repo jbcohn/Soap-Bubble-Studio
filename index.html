@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css?v=1.5">
+    <link rel="stylesheet" href="style.css?v=1.6">
 </head>
 <body>
     <div id="app-container">
@@ -188,7 +188,7 @@
                             <label for="slider-attraction">Capillary Attraction</label>
                             <span class="val-badge" id="val-attraction">1.40</span>
                         </div>
-                        <input type="range" id="slider-attraction" min="0.20" max="10.00" step="0.05" value="1.40">
+                        <input type="range" id="slider-attraction" min="0.20" max="20.00" step="0.05" value="1.40">
                     </div>
 
                     <div class="control-row">
@@ -225,13 +225,13 @@
                                 </span>
                             </label>
                             <label class="switch">
-                                <input type="checkbox" id="check-popping">
+                                <input type="checkbox" id="check-popping" checked>
                                 <span class="slider-toggle"></span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="control-row" id="row-pop-angle" style="display: none;">
+                    <div class="control-row" id="row-pop-angle" style="display: flex;">
                         <div class="label-row">
                             <label for="slider-pop-angle">Critical Acute Angle</label>
                             <span class="val-badge" id="val-pop-angle">34°</span>
@@ -335,6 +335,6 @@
     </div>
 
     <!-- Script Entry -->
-    <script src="app.js?v=1.5"></script>
+    <script src="app.js?v=1.6"></script>
 </body>
 </html>
