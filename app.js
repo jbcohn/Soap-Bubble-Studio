@@ -947,10 +947,10 @@ class BubbleRenderer {
             paletteName = "Iridescent Soap Film",
             scale = 1.0,
             offset = [0, 0],
-            lineWidth = 1.8,
+            lineWidth = 1.0,
             transparentBg = false,
-            filmSaturation = 0.75,
-            filmTransparency = 0.60
+            filmSaturation = 0.60,
+            filmTransparency = 0.90
         } = options;
 
         const palette = PALETTES[paletteName] || PALETTES["Iridescent Soap Film"];
@@ -1709,9 +1709,9 @@ class BubbleApp {
         this.variation = 0.55;
         this.distType = "Log-Normal";
         this.paletteName = "Iridescent Soap Film";
-        this.lineWidth = 1.8;
-        this.filmSaturation = 0.75;
-        this.filmTransparency = 0.60;
+        this.lineWidth = 1.0;
+        this.filmSaturation = 0.60;
+        this.filmTransparency = 0.90;
 
         // Interaction Tools: "stir" | "wand" | "pin"
         this.interactionMode = "stir";
